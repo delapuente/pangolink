@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8"/>
+    <title>Pangolink!</title>
+    <script defer src="/bower_components/js-md5/build/md5.min.js"></script>
+    <script defer src="/bower_components/localforage/dist/localforage.nopromises.min.js"></script>
+    <script defer src="/socket.io/socket.io.js"></script>
+    <script defer src="/js/lib/pangolink.js"></script>
+    <script defer src="/js/ui/notifications.js"></script>
+    <script defer src="/js/ui/me.js"></script>
+    <script defer src="/js/ui/friends.js"></script>
+    <script defer src="/js/ui/downloads.js"></script>
+    <script defer src="/js/index.js"></script>
+    <link rel="icon" type="image/png" href="/icons/192x192.png" />
+    <link href="css/style.css" rel="stylesheet" />
+    <meta name="viewport" content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0"/>
+  </head>
+  <body>
+    <section id="main-view" class="view">
+      <header id="me">
+        <img alt="" src=""/>
+        <section id="link-display" hidden><p></p></section>
+        <section id="link-setup" hidden>
+          <form>
+            <input type="email" placeholder="Your e-mail here&hellip;">
+            <button>Go!</button>
+          </form>
+        </section>
+      </header>
+      <section id="friends">
+        <ul>
+          <template id="friend-template">
+            <li>
+              <figure>
+                <img />
+                <div><figurecaption></figurecaption></div>
+              </figure>
+              <progress value="0.5" max="1" hidden></progress>
+            </li>
+          </template>
+        </ul>
+        <form method="POST" hidden>
+          <input name="destinatary" type="hidden" />
+          <input name="file" type="file" />
+        </form>
+      </section>
+    </section>
+    <section id="downloads" class="view dismissed">
+      <div>
+        <button class="show">&#9652;</button>
+        <ul>
+        </ul>
+      </div>
+    </section>
+  </body>
+</html>
