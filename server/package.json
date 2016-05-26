@@ -1,0 +1,17 @@
+{
+  "name": "pangolink-server",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MPL-2.0",
+  "dependencies": {
+    "content-disposition": "^0.5.1",
+    "express": "^4.13.4",
+    "multer": "^1.1.0",
+    "socket.io": "^1.4.6"
+  }
+}
