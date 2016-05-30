@@ -14,6 +14,14 @@ document.addEventListener('DOMContentLoaded', evt => {
   offlineUi.init(document.getElementById('offline-overlay'));
   notifications.askForPermissions();
 
+  // Intercept the add to home screen prompt
+  window.addEventListener('beforeinstallprompt', evt => {
+    // And prevent it from showing if we are in standalone mode
+    if (window.matchMedia('(display-mode: standalone)').matches) {
+      evt.preventDefault();
+    }
+  });
+
   // Show or hide the offline overlay attending to the connection status.
   window.addEventListener('offline', () => offlineUi.show());
   window.addEventListener('online', () => offlineUi.hide());

@@ -1,0 +1,17 @@
+{
+  "name": "Pangolink!",
+  "short_name": "Pangolink!",
+  "start_url": "/",
+  "description": "The ephemeral share service",
+  "icons": [
+    {
+      "src": "/icons/192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    }
+  ],
+  "orientation": "portrait",
+  "display": "standalone",
+  "theme_color": "#FCE100",
+  "background_color": "#FCE100"
+}
