@@ -1,7 +1,8 @@
 /** globals: meUi, friendsUi, downloadsUi, pangolink, notifications */
 
+var swRegistration;
 if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('sw.js');
+  swRegistration = navigator.serviceWorker.register('sw.js');
 }
 
 document.addEventListener('DOMContentLoaded', evt => {
@@ -33,13 +34,7 @@ document.addEventListener('DOMContentLoaded', evt => {
     downloadsUi.addDownload(details);
 
     // ...and notify.
-    if (document.hidden) {
-      var notification = notifications.newIncomingFilesNotification();
-      notification.onclick = () => downloadsUi.advertNewFiles();
-    }
-    else {
-      downloadsUi.advertNewFiles();
-    }
+    downloadsUi.advertNewFiles();
   };
 
   // Show my downloads.
@@ -52,14 +47,36 @@ document.addEventListener('DOMContentLoaded', evt => {
 
   // Ensure I have an id before...
   ensureMyId()
-    .then(() => {
+    .then(id => {
       // ...allowing to add new friends.
       window.onhashchange = addFriend;
       addFriend();
 
       // And start the application.
-      return pangolink.connect();
+      return startApp();
     });
+
+  /** Connect to the server */
+  function startApp() {
+    if (swRegistration) {
+      return swRegistration
+        .then(subscribe)
+	// Send the endpoint to the server
+        .then(subscription => pangolink.connect(subscription.endpoint));
+    }
+    return pangolink.connect();
+  }
+
+  /** Use Push API to get a push subscription with an endpoint. */
+  function subscribe(registration) {
+    return registration.pushManager.getSubscription()
+      .then(subscription => {
+        if (subscription) {
+          return subscription;
+        }
+        return registration.pushManager.subscribe({ userVisibleOnly: true });
+      });
+  }
 
   /** Check if there is an ID and displays the UI to get one if not. */
   function ensureMyId() {
@@ -67,7 +84,10 @@ document.addEventListener('DOMContentLoaded', evt => {
       .then(link => {
         if (link) {
           return pangolink.getMyId()
-            .then(id => meUi.showLink(id, link));
+            .then(id => {
+              meUi.showLink(id, link);
+              return id;
+            });
         }
 
         return meUi.getEmail()

@@ -5,6 +5,10 @@ var multer = require('multer');
 var http = require('http');
 var socketIo = require('socket.io');
 var contentDisposition = require('content-disposition');
+var webPush = require('web-push');
+
+/** Configure webPush to work with GCM */
+webPush.setGCMAPIKey(process.env.PANGOLINK_GCM_API_KEY);
 
 var app = express();
 var server = http.Server(app);
@@ -49,11 +53,15 @@ app.use('/', express.static('app'));
 /** Stores the sockets by client id. */
 var clients = {};
 
+/** Stores the endpoints by client id. */
+var endpoints = {};
+
 // The socket API simply manages client presence and file queues.
 io.on('connection', socket => {
-  socket.on('identify', id => {
-    console.log(id, 'connected to Pangolink!');
+  socket.on('identify', ({ id, pushEndpoint }) => {
+    console.log(`${id} connected to Pangolink with push endpoint ${pushEndpoint}\n`);
     clients[id] = socket;
+    endpoints[id] = pushEndpoint;
     socket.on('disconnect', () => {
       delete clients[id];
       console.log(`Lost connection with ${id}`);
@@ -75,9 +83,16 @@ function enqueueFile(file, id) {
 
 /** Empties a queue by notifying the client about her pending files. */
 function sendPendingFiles(id) {
+  queues[id] = queues[id] || [];
+
+  var pushEndpoint = endpoints[id];
+  if (pushEndpoint && queues[id].length > 0) {
+    webPush.sendNotification(pushEndpoint, { ttl: 24 * 60 * 60 }).catch(reason => console.error(reason));
+    console.log(`Notification of incoming files sent to ${pushEndpoint}\n`);
+  }
+
   var socket = clients[id];
   if (socket) {
-    queues[id] = queues[id] || [];
     queues[id].forEach(file => socket.emit('file', {
       url: '/uploads/' + file.filename,
       originalname: file.originalname,

@@ -9,13 +9,13 @@
     _socket: null,
 
     /** Register the client with the server. */
-    connect() {
+    connect(pushEndpoint) {
       return this.getMyId()
         .then(id => new Promise((fulfill, reject) => {
           return new Promise((fulfil, reject) => {
             this._socket = io();
             setTimeout(() => {
-              this._socket.emit('identify', id);
+              this._socket.emit('identify', { id, pushEndpoint });
               this._socket.on('file', details => this._advertFile(details));
             }, 1000);
             fulfil();
@@ -67,7 +67,7 @@
         .then(friends => {
           friends[id] = alias;
           return storage.setItem('friends', friends);
-        })
+        });
     },
 
     /**

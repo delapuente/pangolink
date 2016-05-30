@@ -38,6 +38,33 @@ this.onfetch = evt => {
   }
 };
 
+this.onpush = evt => {
+  evt.waitUntil(handlePushNotification());
+};
+
+function handlePushNotification() {
+  return self.registration.showNotification('New incoming files', {
+    body: 'You have new files ready to download',
+    icon: '/icons/192x192.png',
+    tag: 'file'
+  });
+}
+
+this.onnotificationclick = evt => {
+  evt.waitUntil(appToForeground());
+  evt.notification.close();
+};
+
+function appToForeground() {
+  return self.clients.matchAll()
+    .then(clients => {
+      if (clients.length > 0) {
+        return clients[0].focus();
+      }
+      return self.clients.openWindow('/');
+    });
+}
+
 function isAsset(url) {
   return isNotApi(url) && isNotDownload(url) && isNotSocket(url);
 }
