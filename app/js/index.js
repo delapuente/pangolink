@@ -1,5 +1,9 @@
 /** globals: meUi, friendsUi, downloadsUi, pangolink, notifications */
 
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js');
+}
+
 document.addEventListener('DOMContentLoaded', evt => {
   "use strict";
 
@@ -7,7 +11,13 @@ document.addEventListener('DOMContentLoaded', evt => {
   meUi.init(document.getElementById('me'));
   friendsUi.init(document.getElementById('friends'));
   downloadsUi.init(document.getElementById('downloads'));
+  offlineUi.init(document.getElementById('offline-overlay'));
   notifications.askForPermissions();
+
+  // Show or hide the offline overlay attending to the connection status.
+  window.addEventListener('offline', () => offlineUi.show());
+  window.addEventListener('online', () => offlineUi.hide());
+  offlineUi[navigator.onLine ? 'hide' : 'show']();
 
   // Set the callback to invoke when receiving a new file.
   pangolink.onfile = details => {
